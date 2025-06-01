@@ -13,12 +13,17 @@ jobs:
       matrix:
         containers: [1, 2]
     steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'yarn'
       - name: Checkout
         uses: actions/checkout@v4
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
-          start: npm start
+          start: yarn start
           wait-on: 'http://localhost:${{ secrets.HTTP_PORT }}'
           record: true
           parallel: true
