@@ -22,14 +22,17 @@ jobs:
           cache: 'yarn'
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+      - name: Debug - List template files
+        run: ls -laR src/views/template/
       - name: Run tsup
         run: npx tsup
       - name: Copy view templates if they exist
         run: |
-          if ls src/views/template/*.html src/views/template/*.pug > /dev/null 2>&1; then
+          if find src/views/template/ -maxdepth 1 -name "*.html" -o -name "*.pug" | grep -q .; then
+            echo "Found templates to copy, proceeding with copyfiles."
             npx copyfiles -u 1 'src/views/template/*.html' 'src/views/template/*.pug' dist
           else
-            echo "No templates to copy"
+            echo "No templates to copy."
           fi
       - name: Cypress run
         uses: cypress-io/github-action@v6
