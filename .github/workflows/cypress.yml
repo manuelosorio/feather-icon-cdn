@@ -13,13 +13,24 @@ jobs:
       matrix:
         containers: [1, 2]
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: 'yarn'
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Run tsup
+        run: npx tsup
+      - name: Copy view templates if they exist
+        run: |
+          if ls src/views/template/*.html src/views/template/*.pug > /dev/null 2>&1; then
+            npx copyfiles -u 1 'src/views/template/*.html' 'src/views/template/*.pug' dist
+          else
+            echo "No templates to copy"
+          fi
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
