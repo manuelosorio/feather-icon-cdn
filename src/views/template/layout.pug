@@ -12,37 +12,38 @@ html(lang="en")
         height: 100%;
         margin: 0;
       }
-    script(src='/assets/scripts/post-hog.js')
-    script.
-      // Initialize PostHog
-      posthog.init("#{posthogPublicKey}", {
-        api_host: 'https://us.i.posthog.com',
-        persistence: 'memory', // Use memory if cookies are restricted
-      });
-
-      // Optionally enable session recording
-      posthog.startSessionRecording();
-
-      // Track $pageview event
-      posthog.capture('$pageview', {
-        $current_url: window.location.href,
-        $referrer: document.referrer,
-      });
-
-      // Track $pageleave events
-      window.addEventListener('beforeunload', () => {
-        posthog.capture('$pageleave', {
-          $current_url: window.location.href,
+    if posthogPublicKey
+      script(src='/assets/scripts/post-hog.js')
+      script.
+        // Initialize PostHog
+        posthog.init("#{posthogPublicKey}", {
+          api_host: 'https://us.i.posthog.com',
+          persistence: 'memory', // Use memory if cookies are restricted
         });
-      });
 
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'hidden') {
+        // Optionally enable session recording
+        posthog.startSessionRecording();
+
+        // Track $pageview event
+        posthog.capture('$pageview', {
+          $current_url: window.location.href,
+          $referrer: document.referrer,
+        });
+
+        // Track $pageleave events
+        window.addEventListener('beforeunload', () => {
           posthog.capture('$pageleave', {
             $current_url: window.location.href,
           });
-        }
-      });
+        });
+
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'hidden') {
+            posthog.capture('$pageleave', {
+              $current_url: window.location.href,
+            });
+          }
+        });
   body
     div(style="position: relative; height: 350px")
       .hero(style=`background-image: url(${img});`)

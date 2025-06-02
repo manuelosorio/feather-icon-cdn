@@ -5,36 +5,37 @@ head
   title= title
   meta(name='viewport' content='width=device-width, initial-scale=1')
   link(href='/assets/css/main.css' rel='stylesheet')
-  script(src='/assets/scripts/post-hog.js')
-  script.
-    // Initialize PostHog
-    posthog.init("#{posthogPublicKey}", {
-      api_host: 'https://us.i.posthog.com',
-      persistence: 'memory', // Use memory if cookies are restricted
-    });
-
-    // Optionally enable session recording
-    posthog.startSessionRecording();
-
-    // Track $pageview event
-    posthog.capture('$pageview', {
-      $current_url: window.location.href,
-      $referrer: document.referrer,
-    });
-
-    // Track $pageleave events
-    window.addEventListener('beforeunload', () => {
-      posthog.capture('$pageleave', {
-        $current_url: window.location.href,
+  if posthogPublicKey
+    script(src='/assets/scripts/post-hog.js')
+    script.
+      // Initialize PostHog
+      posthog.init("#{posthogPublicKey}", {
+        api_host: 'https://us.i.posthog.com',
+        persistence: 'memory', // Use memory if cookies are restricted
       });
-    });
 
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
+      // Optionally enable session recording
+      posthog.startSessionRecording();
+
+      // Track $pageview event
+      posthog.capture('$pageview', {
+        $current_url: window.location.href,
+        $referrer: document.referrer,
+      });
+
+      // Track $pageleave events
+      window.addEventListener('beforeunload', () => {
         posthog.capture('$pageleave', {
           $current_url: window.location.href,
         });
-      }
-    });
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+          posthog.capture('$pageleave', {
+            $current_url: window.location.href,
+          });
+        }
+      });
   body(style=`background-image: url(${src}); background-size: cover;`)#error_page
   h1= errorCode + " - " + title

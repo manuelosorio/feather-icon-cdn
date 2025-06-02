@@ -96,37 +96,38 @@ html
           width: 23%;
         }
       }
-    script(src='/assets/scripts/post-hog.js')
-    script.
-      // Initialize PostHog
-      posthog.init("#{posthogPublicKey}", {
-        api_host: 'https://us.i.posthog.com',
-        persistence: 'memory'
-      });
-
-      // Optionally enable session recording
-      posthog.startSessionRecording();
-
-      // Track $pageview event
-      posthog.capture('$pageview', {
-        $current_url: window.location.href,
-        $referrer: document.referrer,
-      });
-
-      // Track $pageleave events
-      window.addEventListener('beforeunload', () => {
-        posthog.capture('$pageleave', {
-          $current_url: window.location.href,
+    if posthogPublicKey
+      script(src='/assets/scripts/post-hog.js')
+      script.
+        // Initialize PostHog
+        posthog.init("#{posthogPublicKey}", {
+          api_host: 'https://us.i.posthog.com',
+          persistence: 'memory'
         });
-      });
 
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'hidden') {
+        // Optionally enable session recording
+        posthog.startSessionRecording();
+
+        // Track $pageview event
+        posthog.capture('$pageview', {
+          $current_url: window.location.href,
+          $referrer: document.referrer,
+        });
+
+        // Track $pageleave events
+        window.addEventListener('beforeunload', () => {
           posthog.capture('$pageleave', {
             $current_url: window.location.href,
           });
-        }
-      });
+        });
+
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'hidden') {
+            posthog.capture('$pageleave', {
+              $current_url: window.location.href,
+            });
+          }
+        });
   body
     div.search-bar
       input(type='text' placeholder='Search icons...' id='search-input')

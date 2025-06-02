@@ -9,6 +9,7 @@ import * as variables from './config/variables';
 import { environment } from './config/environment';
 import { notFound } from './views/errors/404';
 import { iconsView } from './views/icons/icons';
+import { posthog } from './config/variables';
 
 const apiLimiter = rateLimit({
   windowMs: variables.rateLimit.windowMs,
@@ -35,6 +36,10 @@ const cspOptions = {
 };
 
 app.use((req, _res, next) => {
+if (!posthog.publicKey) {
+    console.warn('PostHog public key is not set. PostHog tracking will be disabled.');
+    return next();
+  }
   const client = new PostHog(variables.posthog.publicKey, {
     host: 'https://us.i.posthog.com',
   });
